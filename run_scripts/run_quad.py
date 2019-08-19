@@ -5,10 +5,10 @@ from learning_to_adapt.trainers.mb_trainer import Trainer
 from learning_to_adapt.policies.mpc_controller import MPCController
 from learning_to_adapt.samplers.sampler import Sampler
 from learning_to_adapt.logger import logger
-from learning_to_adapt.envs.normalized_env import normalize
+from learning_to_adapt.envs_vrep.normalized_env import normalize
 from learning_to_adapt.utils.utils import ClassEncoder
 from learning_to_adapt.samplers.model_sample_processor import ModelSampleProcessor
-from learning_to_adapt.envs import *
+from learning_to_adapt.envs_vrep.quadrotor_vrep_env import QuadrotorVrepEnv
 import json
 import os
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         'num_cem_iters': 5,
 
         # Training:
-        'num_rollouts': 5,
+        'num_rollouts': 1,
         'valid_split_ratio': 0.1,
         'rolling_average_persitency': 0.99,
         'initial_random_samples': True,
@@ -102,5 +102,6 @@ if __name__ == '__main__':
         'adapt_batch_size': 16,    
 
         #  Other
-        'n_parallel': 5,    
+        'n_parallel': 1,    
     }
+    run_experiment(config)

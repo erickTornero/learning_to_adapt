@@ -5,11 +5,11 @@ import gym
 from gym import spaces
 import numpy as np
 
-from wrapper.utility import GetFlatRotationMatrix
+from .utility import GetFlatRotationMatrix
 # From environment
 import sys
 #sys.path.append('.')
-import wrapper.vrep as vrep
+import learning_to_adapt.envs_vrep.wrapper_quad.vrep as vrep
 from typing import NoReturn
 import time
 from random import gauss

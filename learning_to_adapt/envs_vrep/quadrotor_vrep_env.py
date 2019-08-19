@@ -1,5 +1,5 @@
 import numpy as np
-from learning_to_adapt.envs.wrapper_quad.wrapper_vrep import VREPQuad
+from learning_to_adapt.envs_vrep.wrapper_quad.wrapper_vrep import VREPQuad
 from learning_to_adapt.utils.serializable import Serializable
 from learning_to_adapt.logger import logger
 import os
@@ -31,6 +31,30 @@ class QuadrotorVrepEnv(VREPQuad, Serializable):
         # TODO: Force Done to be True??, check!
         done = False
         return ob, rw, done, info
+
+
+    def reward(self, obs, action, next_obs):
+        """
+        Define the reward function just from states
+        for Model Predictive Control
+        """
+        assert obs.ndim     == 2
+        assert obs.shape    == next_obs.shape
+        assert obs.shape[0] == next_obs.shape[0]
+
+        # TODO: Check how to define the reward function
+        # define it from states
+        targetpos   =   self.targetpos
+        currpos     =   obs[9:12]
+
+        distance    =   targetpos - currpos
+        distance    =   np.sqrt(distance * distance)
+
+        reward      =   4.0 - 1.25 * distance
+
+        return reward   
+
+
 
     def reset_task(self, value=None):
         if self.task == 'rotorless':
