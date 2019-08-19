@@ -31,6 +31,11 @@ class IterativeEnvExecutor(object):
         """
         assert len(actions) == self.num_envs
 
+        """
+        Init 5 envs different ports
+        Change Deep copy to create a new env with different ports, enable parallel mode
+        """
+        
         all_results = [env.step(a) for (a, env) in zip(actions, self.envs)]
 
         # stack results split to obs, rewards, ...
