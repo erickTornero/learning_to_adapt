@@ -19,8 +19,10 @@ def run_experiment(config):
     logger.configure(dir=exp_dir, format_strs=['stdout', 'log', 'csv'], snapshot_mode='last')
     json.dump(config, open(exp_dir + '/params.json', 'w'), indent=2, sort_keys=True, cls=ClassEncoder)
 
-    env = normalize(config['env'](reset_every_episode=True, task=config['task']))
-
+    ports = [19999, 20001, 21001]
+    #env = normalize(config['env'](reset_every_episode=True, task=config['task'], port=19999))
+    envs = [normalize(config['env'](reset_every_episode=True, port=pt)) for pt in ports]
+    env = envs[0]
     dynamics_model = MetaMLPDynamicsModel(
         name="dyn_model",
         env=env,
@@ -52,6 +54,9 @@ def run_experiment(config):
         max_path_length=config['max_path_length'],
         num_rollouts=config['num_rollouts'],
         adapt_batch_size=config['adapt_batch_size'],  # Comment this out and it won't adapt during rollout
+        envclass=config['env'],
+        envs = envs,
+        ports=ports
     )
 
     sample_processor = ModelSampleProcessor(recurrent=True)
@@ -87,7 +92,7 @@ if __name__ == '__main__':
         'num_cem_iters': 5,
 
         # Training:
-        'num_rollouts': 1,
+        'num_rollouts': 3,
         'valid_split_ratio': 0.1,
         'rolling_average_persitency': 0.99,
         'initial_random_samples': True,
@@ -102,6 +107,6 @@ if __name__ == '__main__':
         'adapt_batch_size': 16,    
 
         #  Other
-        'n_parallel': 1,    
+        'n_parallel': 3,    
     }
     run_experiment(config)

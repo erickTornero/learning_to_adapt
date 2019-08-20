@@ -1,6 +1,7 @@
 import numpy as np
 import pickle as pickle
 from multiprocessing import Process, Pipe
+from learning_to_adapt.envs_vrep.normalized_env import normalize
 import copy
 
 
@@ -47,7 +48,7 @@ class IterativeEnvExecutor(object):
         dones = np.logical_or(self.ts >= self.max_path_length, dones)
 
         for i in np.argwhere(dones).flatten():
-            obs[i] = self.envs[i].reset()
+            obs[i] = self.envs[i].rExiteset()
             self.ts[i] = 0
 
         return obs, rewards, dones, env_infos
@@ -57,7 +58,7 @@ class IterativeEnvExecutor(object):
         Resets the environments
 
         Returns:
-            (list): list of (np.ndarray) with the new initial observations.
+            (list): list of (np.ndaconfigrray) with the new initial observations.
         """
         obses = [env.reset() for env in self.envs]
         self.ts[:] = 0
@@ -71,6 +72,64 @@ class IterativeEnvExecutor(object):
         Returns:
             (int): number of environments
         """
+        return self._num_envs
+
+class ParallelVrepExecutor(object):
+    def __init__(self, env_first, n_parallel, num_rollouts, max_path_length, envclass=None, envs = None, ports=None):
+        assert num_rollouts % n_parallel == 0
+        self.envs_per_proc = int(num_rollouts/n_parallel)
+        self._num_envs = n_parallel * self.envs_per_proc
+        #print(len(ports) + 1, self._num_envs)
+        assert (len(ports)) == self._num_envs
+
+        self.n_parallel = n_parallel
+        self.remotes, self.work_remotes = zip(*[Pipe() for _ in range(n_parallel)])
+        seeds = np.random.choice(range(10**6), size=n_parallel, replace=False)
+
+        #envs = [normalize(envclass(reset_every_episode=True, port=pt)) for pt in ports]
+        envs = envs
+        # insert the first environment created!
+        envs.insert(0, env_first)
+
+        self.ps = [
+            Process(target=worker, args=(work_remote, remote, env, self.envs_per_proc, max_path_length, seed))
+            for (work_remote, remote, seed, env) in zip(self.work_remotes, self.remotes, seeds, envs)]  # Why pass work remotes?
+
+        for p in self.ps:
+            p.daemon = True  # if the main process crashes, we should not cause things to hang
+            p.start()
+        for remote in self.work_remotes:
+            remote.close()
+
+    def step(self, actions):
+        assert len(actions) == self.num_envs
+
+        # split list of actions in list of list of actions per meta tasks
+        chunks = lambda l, n: [l[x: x + n] for x in range(0, len(l), n)]
+        actions_per_meta_task = chunks(actions, self.envs_per_proc)
+
+        # step remote environments
+        for remote, action_list in zip(self.remotes, actions_per_meta_task):
+            remote.send(('step', action_list))
+
+        results = [remote.recv() for remote in self.remotes]
+
+        obs, rewards, dones, env_infos = map(lambda x: sum(x, []), zip(*results))
+
+        return obs, rewards, dones, env_infos
+
+    def reset(self):
+        for remote in self.remotes:
+            remote.send(('reset', None))
+        return sum([remote.recv() for remote in self.remotes], [])
+
+    def set_tasks(self, tasks=None):
+        for remote, task in zip(self.remotes, tasks):
+            remote.send(('set_task', task))
+        for remote in self.remotes:
+            remote.recv()
+    @property
+    def num_envs(self):
         return self._num_envs
 
 
@@ -176,7 +235,7 @@ def worker(remote, parent_remote, env_pickle, n_envs, max_path_length, seed):
     """
     parent_remote.close()
 
-    envs = [pickle.loads(env_pickle) for _ in range(n_envs)]
+    envs = [env_pickle for _ in range(n_envs)]
     np.random.seed(seed)
 
     ts = np.zeros(n_envs, dtype='int')

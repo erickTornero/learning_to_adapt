@@ -26,10 +26,10 @@ class VREPQuad(gym.Env):
         super(VREPQuad, self).__init__()
         # Initialize vrep
         self.envname            =   envname
-        vrep.simxFinish(-1)
+        #vrep.simxFinish(-1)
         clientID                =   vrep.simxStart(ip, port, True, True, 5000, 0)
         if clientID != -1:
-            print('Connection Established Successfully')
+            print('Connection Established Successfully to IP> {} - Port> {} - ID: {}'.format(ip, port, clientID))
             self.clientID       =   clientID
             self.targetpos      =   targetpos
             self.max_distance   =   maxdist   
@@ -74,7 +74,7 @@ class VREPQuad(gym.Env):
         # assume of action be an np.array of dimension (4,)
         # Act!
         #action  =   action + 50.0
-        
+        #print('{}-act> {}'.format(self.clientID, action))
         for act, name in zip(action, self.propsignal):
             vrep.simxSetFloatSignal(self.clientID, name, act, vrep.simx_opmode_streaming)
         
@@ -286,7 +286,7 @@ class VREPQuad(gym.Env):
 
     
     def close(self):
-        print('Exit connection')
+        print('Exit connection from ID client> {}'.format(self.clientID))
         vrep.simxClearIntegerSignal(self.clientID, 'signal_debug', vrep.simx_opmode_blocking)
         vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_blocking)
         time.sleep(2.5)

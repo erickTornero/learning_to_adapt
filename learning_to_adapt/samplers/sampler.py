@@ -1,5 +1,5 @@
 from learning_to_adapt.samplers.base import BaseSampler
-from learning_to_adapt.samplers.vectorized_env_executor import ParallelEnvExecutor, IterativeEnvExecutor
+from learning_to_adapt.samplers.vectorized_env_executor import ParallelEnvExecutor, IterativeEnvExecutor, ParallelVrepExecutor
 from learning_to_adapt.logger import logger
 from learning_to_adapt.utils import utils
 from pyprind import ProgBar
@@ -22,6 +22,10 @@ class Sampler(BaseSampler):
             max_path_length,
             n_parallel=1,
             adapt_batch_size=None,
+            # Alternative to VRep Environments
+            envclass=None,
+            envs = None,
+            ports=None
 
     ):
         super(Sampler, self).__init__(env, policy, n_parallel, max_path_length)
@@ -32,8 +36,9 @@ class Sampler(BaseSampler):
         self.adapt_batch_size = adapt_batch_size
 
         # setup vectorized environment
-
-        if self.n_parallel > 1:
+        if self.n_parallel > 1 and ports is not None:
+            self.vec_env = ParallelVrepExecutor(env, n_parallel, num_rollouts,self.max_path_length, envclass, envs, ports)
+        elif self.n_parallel > 1:
             self.vec_env = ParallelEnvExecutor(env, n_parallel, num_rollouts, self.max_path_length)
         else:
             self.vec_env = IterativeEnvExecutor(env, num_rollouts, self.max_path_length)
