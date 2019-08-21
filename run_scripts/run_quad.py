@@ -19,13 +19,15 @@ def run_experiment(config):
     logger.configure(dir=exp_dir, format_strs=['stdout', 'log', 'csv'], snapshot_mode='last')
     json.dump(config, open(exp_dir + '/params.json', 'w'), indent=2, sort_keys=True, cls=ClassEncoder)
 
-    ports = [19999, 20001, 21001]
+    port_policy = 21001
+    ports = [19999, 20001]
     #env = normalize(config['env'](reset_every_episode=True, task=config['task'], port=19999))
-    envs = [normalize(config['env'](reset_every_episode=True, port=pt)) for pt in ports]
-    env = envs[0]
+    #_envs = [normalize(config['env'](reset_every_episode=True, port=pt)) for pt in ports]
+    # For the policy & etc
+    _env = normalize(config['env'](reset_every_episode=True, task=config['task'], port= port_policy))
     dynamics_model = MetaMLPDynamicsModel(
         name="dyn_model",
-        env=env,
+        env=_env,
         meta_batch_size=config['meta_batch_size'],
         inner_learning_rate=config['inner_learning_rate'],
         learning_rate=config['learning_rate'],
@@ -38,7 +40,7 @@ def run_experiment(config):
 
     policy = MPCController(
         name="policy",
-        env=env,
+        env=_env,
         dynamics_model=dynamics_model,
         discount=config['discount'],
         n_candidates=config['n_candidates'],
@@ -48,21 +50,19 @@ def run_experiment(config):
     )
 
     sampler = Sampler(
-        env=env,
+        env=_env,
         policy=policy,
         n_parallel=config['n_parallel'],
         max_path_length=config['max_path_length'],
         num_rollouts=config['num_rollouts'],
         adapt_batch_size=config['adapt_batch_size'],  # Comment this out and it won't adapt during rollout
-        envclass=config['env'],
-        envs = envs,
-        ports=ports
+        ports =ports
     )
 
     sample_processor = ModelSampleProcessor(recurrent=True)
 
     algo = Trainer(
-        env=env,
+        env=_env,
         policy=policy,
         dynamics_model=dynamics_model,
         sampler=sampler,

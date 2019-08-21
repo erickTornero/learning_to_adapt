@@ -23,10 +23,7 @@ class Sampler(BaseSampler):
             n_parallel=1,
             adapt_batch_size=None,
             # Alternative to VRep Environments
-            envclass=None,
-            envs = None,
-            ports=None
-
+            ports = None,
     ):
         super(Sampler, self).__init__(env, policy, n_parallel, max_path_length)
 
@@ -37,11 +34,15 @@ class Sampler(BaseSampler):
 
         # setup vectorized environment
         if self.n_parallel > 1 and ports is not None:
-            self.vec_env = ParallelVrepExecutor(env, n_parallel, num_rollouts,self.max_path_length, envclass, envs, ports)
+            self.vec_env = ParallelVrepExecutor(len(ports), self.max_path_length, ports)
         elif self.n_parallel > 1:
             self.vec_env = ParallelEnvExecutor(env, n_parallel, num_rollouts, self.max_path_length)
         else:
             self.vec_env = IterativeEnvExecutor(env, num_rollouts, self.max_path_length)
+
+    @property
+    def _get_vec_env(self):
+        return self.vec_env
 
     def update_tasks(self):
         pass
@@ -75,6 +76,7 @@ class Sampler(BaseSampler):
         # initial reset of meta_envs
         obses = np.asarray(self.vec_env.reset())
 
+        
         while n_samples < self.total_samples:
 
             # execute policy

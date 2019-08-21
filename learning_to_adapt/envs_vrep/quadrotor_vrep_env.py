@@ -26,6 +26,7 @@ class QuadrotorVrepEnv(VREPQuad, Serializable):
 
     def step(self, action):
         action  =   self.task_mask * action
+        print('in-step-', self.clientID)
         # Call the super method step
         ob, rw, done, info = super().step(action)
         # TODO: Force Done to be True??, check!

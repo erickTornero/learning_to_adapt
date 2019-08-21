@@ -166,7 +166,8 @@ class MetaMLPDynamicsModel(Serializable):
 
     def fit(self, obs, act, obs_next, epochs=1000, compute_normalization=True,
             valid_split_ratio=None, rolling_average_persitency=None, verbose=False, log_tabular=False):
-
+        import pdb
+        pdb.set_trace()
         assert obs.ndim == 3 and obs.shape[2] == self.obs_space_dims
         assert obs_next.ndim == 3 and obs_next.shape[2] == self.obs_space_dims
         assert act.ndim == 3 and act.shape[2] == self.action_space_dims

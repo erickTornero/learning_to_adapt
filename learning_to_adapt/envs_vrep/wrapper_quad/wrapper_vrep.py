@@ -125,7 +125,8 @@ class VREPQuad(gym.Env):
         if done:
             self.episod += 1
             if self.episod % 10 == 0:
-                print('From Target> {:04.2f}'.format(distance))
+                pass
+                #print('From Target> {:04.2f}'.format(distance))
                 #print('Episode:>\t{}\tFrom Target> {:04.2f}\ttimesteps> {}\t Ep Reward> {:05.2f}'.format(self.episod, distance, self.timestep, self.cumulative_rw))
                 #print('From target: {}'.format(distance))
                 #print('timesteps> ',self.timestep)
@@ -137,6 +138,7 @@ class VREPQuad(gym.Env):
         # Compute The reward function
 
     def reset(self):
+        #print('Reset -ing id> ', self.clientID)
         # Put code when reset here
         #r = vrep.simxSetObjectPosition(self.clientID, self.quad_handler, -1, np.array([0.0,0.0,0.5]), vrep.simx_opmode_oneshot_wait)
         #r = vrep.simxCallScriptFunction(self.clientID, 'Quadricopter_target', vrep.sim_scripttype_childscript, 'sysCall_custom_reset', np.array([]), np.array([]), np.array([]), bytearray(), vrep.simx_opmode_blocking)
@@ -158,6 +160,8 @@ class VREPQuad(gym.Env):
                 if not still_running:
                     break
         except: pass
+        
+        #print('Totally stopped> ID> ', self.clientID)
 
         # Reset quadrotor
         r, self.quad_handler        =   vrep.simxGetObjectHandle(self.clientID, self.envname, vrep.simx_opmode_oneshot_wait)
@@ -195,6 +199,7 @@ class VREPQuad(gym.Env):
         self.counterclose   =   0
         #self.timestep       =   0
         self.cumulative_rw  =   0.0
+        #print('Finish reset in ID> ', self.clientID)
         return self._appendtuples_(rdata)
 
     def render(self, close=False):
@@ -208,7 +213,7 @@ class VREPQuad(gym.Env):
             vrep.simxSynchronous(self.clientID, True)
             e = vrep.simxStartSimulation(self.clientID, vrep.simx_opmode_blocking)
 
-            self._set_boolparam(vrep.sim_boolparam_threaded_rendering_enabled, True)
+            #self._set_boolparam(vrep.sim_boolparam_threaded_rendering_enabled, True)
             #print(e)
         else:
             raise ConnectionError('Any conection has been done')
