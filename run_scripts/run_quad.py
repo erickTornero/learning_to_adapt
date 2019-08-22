@@ -20,7 +20,7 @@ def run_experiment(config):
     json.dump(config, open(exp_dir + '/params.json', 'w'), indent=2, sort_keys=True, cls=ClassEncoder)
 
     port_policy = 21001
-    ports = [19999, 20001]
+    ports = [19999, 20001, 22001,23001,24001]
     #env = normalize(config['env'](reset_every_episode=True, task=config['task'], port=19999))
     #_envs = [normalize(config['env'](reset_every_episode=True, port=pt)) for pt in ports]
     # For the policy & etc
@@ -79,10 +79,10 @@ if __name__ == '__main__':
     config = {
         # Environment
         'env': QuadrotorVrepEnv,
-        'max_path_length': 1000,
+        'max_path_length': 250,
         'task': None,
         'normalize': True,
-            'n_itr': 50,
+            'n_itr': 200,
         'discount': 1.,
 
         # Policy:

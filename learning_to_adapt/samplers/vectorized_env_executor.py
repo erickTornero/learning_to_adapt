@@ -59,7 +59,7 @@ class IterativeEnvExecutor(object):
         Resets the environments
 
         Returns:
-            (list): list of (np.ndarray) with the new initial observations.
+            (list): list of (np.ndarray) with the new initial observaremoteions.
         """
         obses = [env.reset() for env in self.envs]
         self.ts[:] = 0
@@ -115,6 +115,8 @@ class ParallelVrepExecutor(object):
             remote.send(('step', action_list))
 
         results = [remote.recv() for remote in self.remotes]
+        #import pdb
+        #pdb.set_trace()
         #print(results)
         obs, rws, dones, env_infos = map(lambda x: x, zip(*results))
         #print(obs)
@@ -276,7 +278,7 @@ def worker(remote, parent_remote, env_pickle, n_envs, max_path_length, seed):
     """
     parent_remote.close()
 
-    envs = [env_pickle for _ in range(n_envs)]
+    envs = [pickle.loads(env_pickle) for _ in range(n_envs)]
     np.random.seed(seed)
 
     ts = np.zeros(n_envs, dtype='int')

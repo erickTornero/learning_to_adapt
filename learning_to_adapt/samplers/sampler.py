@@ -7,6 +7,7 @@ import numpy as np
 import time
 import itertools
 
+RUNNING_VREP    =   True
 
 class Sampler(BaseSampler):
     """
@@ -76,6 +77,8 @@ class Sampler(BaseSampler):
         # initial reset of meta_envs
         obses = np.asarray(self.vec_env.reset())
 
+        if RUNNING_VREP:
+            ndones = 0
         
         while n_samples < self.total_samples:
 
@@ -122,6 +125,8 @@ class Sampler(BaseSampler):
 
                 # if running path is done, add it to paths and empty the running path
                 if done:
+                    #import pdb
+                    #pdb.set_trace()
                     paths.append(dict(
                         observations=np.asarray(running_paths[idx]["observations"]),
                         actions=np.asarray(running_paths[idx]["actions"]),

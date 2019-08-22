@@ -45,11 +45,14 @@ class QuadrotorVrepEnv(VREPQuad, Serializable):
 
         # TODO: Check how to define the reward function
         # define it from states
+        #import pdb
+        #pdb.set_trace()
         targetpos   =   self.targetpos
-        currpos     =   obs[9:12]
+        targetpos   =   np.array([targetpos] * obs.shape[0])
+        currpos     =   obs[:, 9:12]
 
         distance    =   targetpos - currpos
-        distance    =   np.sqrt(distance * distance)
+        distance    =   np.sqrt(np.sum(distance * distance, axis=1))
 
         reward      =   4.0 - 1.25 * distance
 
