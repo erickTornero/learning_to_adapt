@@ -113,16 +113,16 @@ class VREPQuad(gym.Env):
         reward          =   self.targetpos - position
         distance        =   np.sqrt((reward * reward).sum())
         reward          =   4.0 -1.25 * distance 
-        if distance > 3.2:
-            reward = 0.0
+        #if distance > 3.2:
+        #    reward = 0.0
         self.cumulative_rw  +=  reward
 
         #print(reward)
         
         #print(action)
         #done            =   (True if self.timestep >= 250 else False) | (distance > 3.2)
-        #done             =   (distance > 3.2)
-        done            =   False
+        done             =   (distance > 3.2)
+        #done            =   False
         #done            =   distance > self.max_distance or self.counterclose > self.maxncounter
 
         if done:

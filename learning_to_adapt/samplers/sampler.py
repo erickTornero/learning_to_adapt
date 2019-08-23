@@ -7,6 +7,8 @@ import numpy as np
 import time
 import itertools
 
+from IPython.core.debugger import set_trace
+
 RUNNING_VREP    =   True
 
 class Sampler(BaseSampler):
@@ -32,6 +34,7 @@ class Sampler(BaseSampler):
         self.n_parallel = n_parallel
         self.total_timesteps_sampled = 0
         self.adapt_batch_size = adapt_batch_size
+
 
         # setup vectorized environment
         if self.n_parallel > 1 and ports is not None:
@@ -124,20 +127,22 @@ class Sampler(BaseSampler):
                 running_paths[idx]["agent_infos"].append(agent_info)
 
                 # if running path is done, add it to paths and empty the running path
-                if done:
-                    #import pdb
-                    #pdb.set_trace()
+                #if done:
+                    
+                if len(running_paths[idx]['rewards']) >= self.max_path_length:
+                    #from IPython.core.debugger import set_trace
+                    #set_trace()
                     paths.append(dict(
-                        observations=np.asarray(running_paths[idx]["observations"]),
-                        actions=np.asarray(running_paths[idx]["actions"]),
-                        rewards=np.asarray(running_paths[idx]["rewards"]),
-                        dones=np.asarray(running_paths[idx]["dones"]),
-                        env_infos=utils.stack_tensor_dict_list(running_paths[idx]["env_infos"]),
-                        agent_infos=utils.stack_tensor_dict_list(running_paths[idx]["agent_infos"]),
+                        observations=np.asarray(running_paths[idx]["observations"][:self.max_path_length]),
+                        actions=np.asarray(running_paths[idx]["actions"][:self.max_path_length]),
+                        rewards=np.asarray(running_paths[idx]["rewards"][:self.max_path_length]),
+                        dones=np.asarray(running_paths[idx]["dones"][:self.max_path_length]),
+                        env_infos=utils.stack_tensor_dict_list(running_paths[idx]["env_infos"][:self.max_path_length]),
+                        agent_infos=utils.stack_tensor_dict_list(running_paths[idx]["agent_infos"][:self.max_path_length]),
                     ))
-                    new_samples += len(running_paths[idx]["rewards"])
+                    new_samples += len(running_paths[idx]["rewards"][:self.max_path_length])
                     running_paths[idx] = _get_empty_running_paths_dict()
-
+        
             pbar.update(self.vec_env.num_envs)
             n_samples += new_samples
             obses = next_obses
