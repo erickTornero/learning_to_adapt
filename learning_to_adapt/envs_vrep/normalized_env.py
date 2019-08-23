@@ -61,9 +61,10 @@ class NormalizedEnv(Serializable):
 
     @property
     def action_space(self):
-        if isinstance(self._wrapped_env.action_space, Box):
-            ub = np.ones(self._wrapped_env.action_space.shape) * self._normalization_scale
-            return Box(-1 * ub, ub, dtype=np.float32)
+        #if isinstance(self._wrapped_env.action_space, Box):
+        #    ub = np.ones(self._wrapped_env.action_space.shape) * self._normalization_scale
+        #    return Box(-1 * ub, ub, dtype=np.float32)
+
         return self._wrapped_env.action_space
 
     def __getattr__(self, attr):

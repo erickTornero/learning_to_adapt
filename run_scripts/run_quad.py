@@ -12,7 +12,7 @@ from learning_to_adapt.envs_vrep.quadrotor_vrep_env import QuadrotorVrepEnv
 import json
 import os
 
-EXP_NAME = 'grbalquad'
+EXP_NAME = 'grbalquad_early_stop'
 
 def run_experiment(config):
     exp_dir = os.getcwd() + '/data/' + EXP_NAME + '/' + config.get('exp_name', '')
@@ -21,6 +21,7 @@ def run_experiment(config):
 
     port_policy = 21001
     ports = [19999, 20001, 22001,23001,24001]
+    #ports = [25001, 26001]
     #env = normalize(config['env'](reset_every_episode=True, task=config['task'], port=19999))
     #_envs = [normalize(config['env'](reset_every_episode=True, port=pt)) for pt in ports]
     # For the policy & etc
@@ -82,7 +83,7 @@ if __name__ == '__main__':
         'max_path_length': 250,
         'task': None,
         'normalize': True,
-            'n_itr': 200,
+            'n_itr': 400,
         'discount': 1.,
 
         # Policy:
@@ -92,7 +93,7 @@ if __name__ == '__main__':
         'num_cem_iters': 5,
 
         # Training:
-        'num_rollouts': 3,
+        'num_rollouts': 5,
         'valid_split_ratio': 0.1,
         'rolling_average_persitency': 0.99,
         'initial_random_samples': True,
@@ -107,6 +108,6 @@ if __name__ == '__main__':
         'adapt_batch_size': 16,    
 
         #  Other
-        'n_parallel': 3,    
+        'n_parallel': 5,    
     }
     run_experiment(config)
