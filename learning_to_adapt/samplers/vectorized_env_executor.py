@@ -3,6 +3,7 @@ import pickle as pickle
 from multiprocessing import Process, Pipe
 from learning_to_adapt.envs_vrep.normalized_env import normalize
 from learning_to_adapt.envs_vrep.wrapper_quad.wrapper_vrep import VREPQuad
+from learning_to_adapt.envs_vrep.quadrotor_vrep_env import QuadrotorVrepEnv
 import copy
 
 
@@ -138,7 +139,8 @@ class ParallelVrepExecutor(object):
         return observations
 
     def worker(self, remote, parent_remote, max_path_length, seed, port_):
-        env = VREPQuad(port=port_)
+        #env = VREPQuad(port=port_)
+        env = QuadrotorVrepEnv(task='rotorless', reset_every_episode=True, port=port_)
         if port_ == self.ports[0]:
             self.env_ = env
         np.random.seed(seed)

@@ -103,7 +103,7 @@ class Sampler(BaseSampler):
                     policy.dynamics_model.adapt(adapt_obs, adapt_act, adapt_next_obs)
                 actions, agent_infos = policy.get_actions(obses)
             policy_time += time.time() - t
-
+            #print(actions)
             # step environments
             t = time.time()
             next_obses, rewards, dones, env_infos = self.vec_env.step(actions)
