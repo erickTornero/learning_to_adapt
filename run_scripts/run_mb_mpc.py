@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '.')
 from learning_to_adapt.dynamics.mlp_dynamics import MLPDynamicsModel
 from learning_to_adapt.trainers.mb_trainer import Trainer
 from learning_to_adapt.policies.mpc_controller import MPCController
@@ -10,7 +12,7 @@ from learning_to_adapt.envs import *
 import json
 import os
 
-EXP_NAME = 'mb_mpc'
+EXP_NAME = 'mb_mpc_no_failed_leg_lowlr_6'
 
 
 def run_experiment(config):
@@ -74,22 +76,22 @@ if __name__ == '__main__':
             'task': None,
 
             # Policy
-            'n_candidates': 2000,
-            'horizon': 20,
+            'n_candidates': 1000,
+            'horizon': 10,
             'use_cem': False,
             'num_cem_iters': 5,
             'discount': 1.,
 
             # Sampling
-            'max_path_length': 100,
-            'num_rollouts': 10,
+            'max_path_length': 1000,
+            'num_rollouts': 64,
             'initial_random_samples': True,
 
             # Training
-            'n_itr': 50,
+            'n_itr': 64,
             'learning_rate': 1e-3,
-            'batch_size': 128,
-            'dynamic_model_epochs': 100,
+            'batch_size': 500,
+            'dynamic_model_epochs': 50,
             'valid_split_ratio': 0.1,
             'rolling_average_persitency': 0.99,
 
@@ -99,7 +101,7 @@ if __name__ == '__main__':
 
 
             #  Other
-            'n_parallel': 2,
+            'n_parallel': 8,
             }
 
     run_experiment(config)

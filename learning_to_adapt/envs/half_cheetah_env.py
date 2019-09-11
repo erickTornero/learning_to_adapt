@@ -23,7 +23,7 @@ class HalfCheetahEnv(MujocoEnv, Serializable):
         self._init_geom_size = self.model.geom_size.copy()
         self._init_geom_pos = self.model.geom_pos.copy()
         self.dt = self.model.opt.timestep
-
+        
         assert task in [None, 'cripple']
 
         self.task = task

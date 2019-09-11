@@ -12,7 +12,7 @@ from learning_to_adapt.envs_vrep.quadrotor_vrep_env import QuadrotorVrepEnv
 import json
 import os
 
-EXP_NAME = 'grbalquad_early_stop'
+EXP_NAME = 'grbalquad_early_stop2'
 
 def run_experiment(config):
     exp_dir = os.getcwd() + '/data/' + EXP_NAME + '/' + config.get('exp_name', '')
@@ -57,7 +57,7 @@ def run_experiment(config):
         max_path_length=config['max_path_length'],
         num_rollouts=config['num_rollouts'],
         adapt_batch_size=config['adapt_batch_size'],  # Comment this out and it won't adapt during rollout
-        ports =ports
+        ports = ports
     )
 
     sample_processor = ModelSampleProcessor(recurrent=True)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         'max_path_length': 250,
         'task': None,
         'normalize': True,
-            'n_itr': 400,
+            'n_itr': 120,
         'discount': 1.,
 
         # Policy:

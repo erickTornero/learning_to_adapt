@@ -75,6 +75,7 @@ class VREPQuad(gym.Env):
         # Act!
         #action  =   action + 50.0
         #print('{}-act> {}'.format(self.clientID, action))
+        #action = np.squeeze(action, 0)
         for act, name in zip(action, self.propsignal):
             vrep.simxSetFloatSignal(self.clientID, name, act, vrep.simx_opmode_streaming)
         

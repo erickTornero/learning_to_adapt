@@ -12,7 +12,7 @@ from learning_to_adapt.envs_vrep.quadrotor_vrep_env import QuadrotorVrepEnv
 import json
 import os
 
-EXP_NAME = 'mb_mpc_quad'
+EXP_NAME = 'mb_mpc_quad_2'
 
 
 def run_experiment(config):
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
             # Training
             'n_itr': 100,
-            'learning_rate': 1e-3,
+            'learning_rate': 1e-4,
             'batch_size': 128,
             'dynamic_model_epochs': 100,
             'valid_split_ratio': 0.1,

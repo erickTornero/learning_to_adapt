@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '.')
 from learning_to_adapt.dynamics.rnn_dynamics import RNNDynamicsModel
 from learning_to_adapt.trainers.mb_trainer import Trainer
 from learning_to_adapt.policies.rnn_mpc_controller import RNNMPCController
@@ -86,7 +88,7 @@ if __name__ == '__main__':
             'initial_random_samples': True,
 
             # Training
-            'n_itr': 50,
+            'n_itr': 100,
             'learning_rate': 1e-2,
             'batch_size': 10,
             'backprop_steps': 100,

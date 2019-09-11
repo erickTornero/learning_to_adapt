@@ -102,7 +102,7 @@ class MetaMLPDynamicsModel(Serializable):
         pre_losses = []
         post_losses = []
         self._adapted_params = []
-
+        
         for idx in range(self.meta_batch_size):
             with tf.variable_scope(name + '/pre_model_%d' % idx, reuse=tf.AUTO_REUSE):
                 pre_mlp = MLP(name,
@@ -118,7 +118,7 @@ class MetaMLPDynamicsModel(Serializable):
                 pre_loss = tf.reduce_mean(tf.square(pre_delta_per_task[idx] - pre_delta_pred))
                 adapted_params = self._adapt_sym(pre_loss, pre_mlp.get_params())
                 self._adapted_params.append(adapted_params)
-
+            
             with tf.variable_scope(name + '/post_model_%d' % idx, reuse=tf.AUTO_REUSE):
                 post_mlp = MLP(name,
                                output_dim=obs_space_dims,
@@ -138,7 +138,7 @@ class MetaMLPDynamicsModel(Serializable):
             self.pre_loss = tf.reduce_mean(pre_losses)
             self.post_loss = tf.reduce_mean(post_losses)
             self.train_op = optimizer(self.learning_rate).minimize(self.post_loss)
-
+        
         """ --------------------------- Post-update Inference Graph --------------------------- """
         with tf.variable_scope(name + '_ph_graph'):
             self.post_update_delta = []

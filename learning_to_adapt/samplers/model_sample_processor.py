@@ -35,8 +35,8 @@ class ModelSampleProcessor(SampleProcessor):
         # compute discounted rewards - > returns
         returns = []
         for idx, path in enumerate(paths):
-            from IPython.core.debugger import set_trace
-            set_trace()
+            #from IPython.core.debugger import set_trace
+            #set_trace()
             path["returns"] = tensor_utils.discount_cumsum(path["rewards"], self.discount)
             returns.append(path["returns"])
 
@@ -50,8 +50,8 @@ class ModelSampleProcessor(SampleProcessor):
         actions_dynamics = tensor_utils.concat_tensor_list([path["actions"][:-1] for path in paths], recurrent)
         timesteps_dynamics = tensor_utils.concat_tensor_list([np.arange((len(path["observations"]) - 1)) for path in paths])
 
-        from IPython.core.debugger import set_trace
-        set_trace()
+        #from IPython.core.debugger import set_trace
+        #set_trace()
         rewards = tensor_utils.concat_tensor_list([path["rewards"][:-1] for path in paths], recurrent)
         returns = tensor_utils.concat_tensor_list([path["returns"] for path in paths], recurrent)
 
@@ -71,6 +71,8 @@ class ModelSampleProcessor(SampleProcessor):
         recurrent = self.recurrent
 
         returns = []
+        #from IPython.core.debugger import set_trace
+        #set_trace()
         for idx, path in enumerate(paths):
             dones = list(path['dones'])
             start_index = 0
@@ -89,8 +91,11 @@ class ModelSampleProcessor(SampleProcessor):
             path['returns'] = tensor_utils.concat_tensor_list(pathreturns, False)
             returns.append(path["returns"])
         
-        from IPython.core.debugger import set_trace
-        set_trace()
+        # 8) log statistics if desired
+        self._log_path_stats(paths, log=log, log_prefix=log_prefix)
+        
+        #from IPython.core.debugger import set_trace
+        #set_trace()
         
         list_obs    =   []
         list_nobs   =   []
@@ -109,7 +114,7 @@ class ModelSampleProcessor(SampleProcessor):
                     list_obs.append(path['observations'][start_index:end_index])
                     list_nobs.append(path['observations'][start_index + 1:end_index + 1])
                     list_act.append(path['actions'][start_index:end_index])
-                    list_timstp.append(np.arange(start_index, end_index))
+                    list_timstp.append(np.arange(0, end_index - start_index))
                     list_rws.append(path['rewards'][start_index:end_index])
                     list_rtrns.append(path['returns'][start_index + 1:end_index + 1])
                     
@@ -124,12 +129,14 @@ class ModelSampleProcessor(SampleProcessor):
                         list_rtrns.append(path['returns'][start_index + 1:])
                     break
 
+        #from IPython.core.debugger import set_trace
+        #set_trace()
         observations_dynamics = tensor_utils.concat_tensor_list(list_obs, recurrent)
         next_observations_dynamics = tensor_utils.concat_tensor_list(list_nobs, recurrent)
         actions_dynamics = tensor_utils.concat_tensor_list(list_act, recurrent)
         timesteps_dynamics = tensor_utils.concat_tensor_list(list_timstp)
         rewards = tensor_utils.concat_tensor_list(list_rws)
-        returns = tensor_utils.concat_tensor_list(list_rtrns)
+        returns = tensor_utils.concat_tensor_list(returns)
 
         samples_data = dict(
             observations=observations_dynamics,

@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '.')
 import joblib
 import tensorflow as tf
 import argparse
@@ -12,7 +14,7 @@ if __name__ == "__main__":
     parser.add_argument("param", type=str, help='Directory with the pkl and json file')
     parser.add_argument('--max_path_length', '-l', type=int, default=1000,
                         help='Max length of rollout')
-    parser.add_argument('--num_rollouts', '-n', type=int, default=10,
+    parser.add_argument('--num_rollouts', '-n', type=int, default=100,
                         help='Max length of rollout')
     parser.add_argument('--speedup', type=float, default=1,
                         help='Speedup')

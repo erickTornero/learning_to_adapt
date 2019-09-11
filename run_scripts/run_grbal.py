@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '.')
 from learning_to_adapt.dynamics.meta_mlp_dynamics import MetaMLPDynamicsModel
 from learning_to_adapt.trainers.mb_trainer import Trainer
 from learning_to_adapt.policies.mpc_controller import MPCController
@@ -10,7 +12,7 @@ from learning_to_adapt.envs import *
 import json
 import os
 
-EXP_NAME = 'grbal'
+EXP_NAME = 'grbal_hc_hyp_setted_3'
 
 
 def run_experiment(config):
@@ -19,7 +21,7 @@ def run_experiment(config):
     json.dump(config, open(exp_dir + '/params.json', 'w'), indent=2, sort_keys=True, cls=ClassEncoder)
 
     env = normalize(config['env'](reset_every_episode=True, task=config['task']))
-
+    #env = normalize(config['env'](reset_every_episode=True, task=None))
     dynamics_model = MetaMLPDynamicsModel(
         name="dyn_model",
         env=env,
@@ -32,7 +34,7 @@ def run_experiment(config):
         hidden_nonlinearity=config['hidden_nonlinearity_model'],
         batch_size=config['adapt_batch_size'],
     )
-
+    
     policy = MPCController(
         name="policy",
         env=env,
@@ -43,7 +45,6 @@ def run_experiment(config):
         use_cem=config['use_cem'],
         num_cem_iters=config['num_cem_iters'],
     )
-
     sampler = Sampler(
         env=env,
         policy=policy,
@@ -52,7 +53,7 @@ def run_experiment(config):
         num_rollouts=config['num_rollouts'],
         adapt_batch_size=config['adapt_batch_size'],  # Comment this out and it won't adapt during rollout
     )
-
+    
     sample_processor = ModelSampleProcessor(recurrent=True)
 
     algo = Trainer(
@@ -65,6 +66,7 @@ def run_experiment(config):
         initial_random_samples=config['initial_random_samples'],
         dynamics_model_max_epochs=config['dynamic_model_epochs'],
     )
+
     algo.train()
 
 
@@ -74,35 +76,37 @@ if __name__ == '__main__':
     config = {
                 # Environment
                 'env': HalfCheetahEnv,
+                #'env': AntEnv,
                 'max_path_length': 1000,
-                'task': None,
+                'task': 'cripple',
                 'normalize': True,
-                 'n_itr': 50,
+                 'n_itr': 24,
                 'discount': 1.,
 
                 # Policy
-                'n_candidates': 500,
+                'n_candidates': 1000,
                 'horizon': 10,
                 'use_cem': False,
                 'num_cem_iters': 5,
 
                 # Training
-                'num_rollouts': 5,
+                'num_rollouts': 32,
                 'valid_split_ratio': 0.1,
                 'rolling_average_persitency': 0.99,
                 'initial_random_samples': True,
 
                 # Dynamics Model
-                'meta_batch_size': 10,
+                'meta_batch_size': 32,
+                'batch_size': 500,
                 'hidden_nonlinearity_model': 'relu',
                 'learning_rate': 1e-3,
-                'inner_learning_rate': 0.001,
+                'inner_learning_rate': 0.01,
                 'hidden_sizes_model': (512, 512, 512),
-                'dynamic_model_epochs': 100,
-                'adapt_batch_size': 16,
+                'dynamic_model_epochs': 50,
+                'adapt_batch_size': 32,
 
                 #  Other
-                'n_parallel': 5,
+                'n_parallel': 32,
 
     }
 
